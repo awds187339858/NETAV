@@ -32,14 +32,18 @@ public class BootReceiver extends BroadcastReceiver {
         }
     }
 
-    /** 写回调试开关；没有 WRITE_SECURE_SETTINGS 时静默失败。 */
-    static void applyAdb(Context c, boolean on) {
+    /** 写回调试开关并回读校验；没有 WRITE_SECURE_SETTINGS 时返回 false。 */
+    static boolean applyAdb(Context c, boolean on) {
         try {
             Settings.Global.putInt(c.getContentResolver(),
                     Settings.Global.ADB_ENABLED, on ? 1 : 0);
             Settings.Global.putInt(c.getContentResolver(),
                     Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, on ? 1 : 0);
-        } catch (Exception ignored) {
+            int v = Settings.Global.getInt(c.getContentResolver(),
+                    Settings.Global.ADB_ENABLED, -1);
+            return v == (on ? 1 : 0);
+        } catch (Exception e) {
+            return false;
         }
     }
 }

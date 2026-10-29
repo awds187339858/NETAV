@@ -198,13 +198,49 @@ public class MainActivity extends Activity {
         adbAuto.setChecked(Store.isAdbAuto(this));
         adbAuto.setOnCheckedChangeListener(
                 new android.widget.CompoundButton.OnCheckedChangeListener() {
+                    private boolean suppress = false;
+
                     public void onCheckedChanged(android.widget.CompoundButton b, boolean v) {
+                        if (suppress) {
+                            return;
+                        }
                         Store.setAdbAuto(MainActivity.this, v);
-                        BootReceiver.applyAdb(MainActivity.this, v);
-                        Toast.makeText(MainActivity.this,
-                                v ? "已开启：以后每次开机自动开启"
-                                  : "已关闭：以后每次开机保持关闭",
-                                Toast.LENGTH_SHORT).show();
+                        boolean ok = BootReceiver.applyAdb(MainActivity.this, v);
+                        if (ok) {
+                            Toast.makeText(MainActivity.this,
+                                    v ? "已开启：以后每次开机自动开启"
+                                      : "已关闭：以后每次开机保持关闭",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // 没有 adb 授权：不假装成功，回滚并引导手动开启
+                            suppress = true;
+                            b.setChecked(false);
+                            suppress = false;
+                            Store.setAdbAuto(MainActivity.this, false);
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("无法自动开启")
+                                    .setMessage("本机没有 adb 授权，App 没法直接改这个开关。\n\n"
+                                            + "想现在就用，点「去设置」在这里开：\n"
+                                            + "开发者选项 → 找到「USB 调试」→ 打开\n\n"
+                                            + "（想让它以后自动开启，需要在电脑上执行一次授权命令，"
+                                            + "详见「使用说明 / 关于」）")
+                                    .setPositiveButton("去设置",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface d, int w) {
+                                                    try {
+                                                        startActivity(new Intent(
+                                                                android.provider.Settings
+                                                                        .ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+                                                    } catch (Exception e) {
+                                                        Toast.makeText(MainActivity.this,
+                                                                "打不开开发者选项：" + e.getMessage(),
+                                                                Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            })
+                                    .setNegativeButton("取消", null)
+                                    .show();
+                        }
                         updateUi();
                     }
                 });
