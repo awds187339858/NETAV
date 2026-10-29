@@ -256,6 +256,16 @@ public class MainActivity extends Activity {
         });
         root.addView(amapCmdBtn);
 
+        // ---- ADB 授权命令 ----
+        Button authCmdBtn = new Button(this);
+        authCmdBtn.setText("ADB 授权命令（悬浮窗 / 调试权限）");
+        authCmdBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showAuthCmd();
+            }
+        });
+        root.addView(authCmdBtn);
+
         // ---- 开机预热 ----
         CheckBox preload = new CheckBox(this);
         preload.setTextColor(Color.BLACK);
@@ -442,6 +452,48 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    private void showAuthCmd() {
+        String msg = "车机设置里找不到「悬浮窗」开关？用下面两条命令解决。\n"
+                + "只需执行一次，重装 App 后要重做。\n\n"
+                + "【1. 悬浮窗权限（必做，否则悬浮栏不显示）】\n"
+                + "adb shell appops set com.hz.quickdock "
+                + "SYSTEM_ALERT_WINDOW allow\n\n"
+                + "【2. 开发者选项自动开关（可选）】\n"
+                + "adb shell pm grant com.hz.quickdock "
+                + "android.permission.WRITE_SECURE_SETTINGS\n\n"
+                + "【怎么连上车机】\n"
+                + "方式一：手机（推荐，不用电脑）\n"
+                + "1. 手机装「甲壳虫 ADB 助手」\n"
+                + "2. 车机开热点，手机连这个热点\n"
+                + "3. 车机进 开发者选项 打开 USB 调试\n"
+                + "4. 甲壳虫里填「车机IP:5555」连接\n"
+                + "5. 进「命令行」把上面的命令粘进去执行\n\n"
+                + "方式二：电脑\n"
+                + "1. 电脑连车机热点或同一 WiFi\n"
+                + "2. 电脑装 adb（platform-tools）\n"
+                + "3. 执行：adb connect 车机IP:5555\n"
+                + "4. 再执行上面的命令\n\n"
+                + "【车机 IP 在哪看】\n"
+                + "车机设置 → WLAN → 点当前连接的网络 → IP 地址\n\n"
+                + "【怎么确认成功】\n"
+                + "执行后回到本 App，顶部应显示「悬浮窗权限：已授予」。";
+        TextView tv = new TextView(this);
+        tv.setText(msg);
+        tv.setTextSize(14);
+        tv.setTextColor(0xFFE8E8E8);
+        tv.setTextIsSelectable(true);
+        tv.setPadding(dp(20), dp(16), dp(20), dp(16));
+
+        ScrollView sv = new ScrollView(this);
+        sv.addView(tv);
+
+        new AlertDialog.Builder(this)
+                .setTitle("ADB 授权命令")
+                .setView(sv)
+                .setPositiveButton("关闭", null)
+                .show();
+    }
+
     private void showGuide() {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
@@ -460,6 +512,11 @@ public class MainActivity extends Activity {
                 + "3. 长按任意图标 = 打开本设置页\n"
                 + "4. 「选择要显示的 APP」可勾选任意已安装应用\n"
                 + "5. 「调整图标顺序」里点某一项，就让它上移一位\n\n"
+                + "【悬浮窗权限打不开怎么办】\n"
+                + "如果点「① 授予悬浮窗权限」后找不到开关，或者打开后回来仍显示"
+                + "「未授予」，说明车机把这项藏起来了。\n"
+                + "解决办法：点「ADB 授权命令」按钮，把第 1 条命令复制到"
+                + "甲壳虫 ADB 助手或电脑执行，回本页就会变成「已授予」。\n\n"
                 + "【设置项说明】\n"
                 + "· 图标大小 / 不透明度：拖滑杆实时生效\n"
                 + "· 自动去掉纯色底色：把图标的白底/红底抠透明，只留标志\n"
