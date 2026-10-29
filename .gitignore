@@ -1,6 +1,5 @@
 # 构建产物
 build/
-*.apk
 
 # 签名密钥（绝对不要提交）
 *.keystore
@@ -14,3 +13,5 @@ Thumbs.db
 
 # 临时文件
 *.log
+
+# 注意：release/ 下的 APK 是要发布给用户的，不忽略
