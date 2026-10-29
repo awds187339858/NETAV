@@ -106,65 +106,6 @@ public class DockService extends Service {
         }
     }
 
-    /** 用 su 执行命令（车机 su 无授权弹窗，直接给 root）。 */
-    private int runSu(String cmd) {
-        try {
-            Process p = Runtime.getRuntime().exec(
-                    new String[]{"su", "0", "sh", "-c", cmd});
-            int rc = p.waitFor();
-            if (rc != 0) {
-                try {
-                    java.io.InputStream es = p.getErrorStream();
-                    byte[] buf = new byte[512];
-                    int n = es.read(buf);
-                    android.util.Log.e("QuickDock", "su stderr: "
-                            + (n > 0 ? new String(buf, 0, n) : "(empty)"));
-                } catch (Exception ignored) {
-                }
-            }
-            return rc;
-        } catch (Exception e) {
-            android.util.Log.e("QuickDock", "su exec error: " + e.getClass().getName()
-                    + " / " + e.getMessage());
-            return -1;
-        }
-    }
-
-    private boolean amapDisabled() {
-        try {
-            android.content.pm.ApplicationInfo ai = getPackageManager()
-                    .getApplicationInfo("com.autonavi.amapauto", 0);
-            return !ai.enabled;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /** 一键切换高德：禁用（同时杀掉进程释放内存）/ 释放。 */
-    private void toggleAmap() {
-        final boolean wasDisabled = amapDisabled();
-        final String cmd = wasDisabled
-                ? "pm enable com.autonavi.amapauto"
-                : "pm disable com.autonavi.amapauto; killall -9 com.autonavi.amapauto 2>/dev/null; true";
-        android.util.Log.e("QuickDock", "toggleAmap: wasDisabled=" + wasDisabled + " cmd=" + cmd);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int rc = runSu(cmd);
-                android.util.Log.e("QuickDock", "toggleAmap: su rc=" + rc);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(DockService.this,
-                                wasDisabled ? "高德已释放" : "高德已禁用并释放内存",
-                                Toast.LENGTH_LONG).show();
-                        buildDock();
-                    }
-                });
-            }
-        }).start();
-    }
-
     /** 开机后延迟预热：拉起目标 App 让界面缓存建好，几秒后自动回桌面。 */
     private void schedulePreload() {
         if (!Store.isPreload(this)) {
@@ -310,34 +251,6 @@ public class DockService extends Service {
                 }
             });
             root.addView(vb);
-            count++;
-        }
-
-        if (Store.isAmapBtn(this)) {
-            final boolean off = amapDisabled();
-            ImageView ab = new ImageView(this);
-            ab.setImageResource(off
-                    ? android.R.drawable.ic_menu_revert
-                    : android.R.drawable.ic_menu_close_clear_cancel);
-            ab.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(size, size);
-            ap.topMargin = margin;
-            ab.setLayoutParams(ap);
-            ab.setOnTouchListener(makeTouch(new Runnable() {
-                public void run() {
-                    toggleAmap();
-                }
-            }));
-            ab.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Intent i = new Intent(DockService.this, MainActivity.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
-                    return true;
-                }
-            });
-            root.addView(ab);
             count++;
         }
 

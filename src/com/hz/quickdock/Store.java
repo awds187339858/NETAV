@@ -129,13 +129,4 @@ public final class Store {
     public static void setVoiceBtn(Context c, boolean v) {
         sp(c).edit().putBoolean("voice_btn", v).apply();
     }
-
-    /** 是否在悬浮栏显示「高德开关」按钮。 */
-    public static boolean isAmapBtn(Context c) {
-        return sp(c).getBoolean("amap_btn", false);
-    }
-
-    public static void setAmapBtn(Context c, boolean v) {
-        sp(c).edit().putBoolean("amap_btn", v).apply();
-    }
 }

@@ -222,23 +222,6 @@ public class MainActivity extends Activity {
         });
         root.addView(accBtn);
 
-        // ---- 高德开关按钮 ----
-        CheckBox amapBtn = new CheckBox(this);
-        amapBtn.setTextColor(Color.BLACK);
-        amapBtn.setText("显示「高德开关」按钮（一键禁用/释放高德并释放内存）");
-        amapBtn.setTextSize(14);
-        amapBtn.setChecked(Store.isAmapBtn(this));
-        amapBtn.setOnCheckedChangeListener(
-                new android.widget.CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(android.widget.CompoundButton b, boolean v) {
-                        Store.setAmapBtn(MainActivity.this, v);
-                        if (Store.isEnabled(MainActivity.this)) {
-                            DockService.refresh(MainActivity.this);
-                        }
-                    }
-                });
-        root.addView(amapBtn);
-
         // ---- 立即开启开发者选项 ----
         Button devBtn = new Button(this);
         devBtn.setText("立即开启开发者选项 + adb（免密码）");
