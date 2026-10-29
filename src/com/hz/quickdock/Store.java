@@ -69,11 +69,12 @@ public final class Store {
     }
 
     /** 是否开启了「开机自动确保 adb 可用」。 */
-    public static boolean isFixAdb(Context c) {
-        return sp(c).getBoolean(K_ADB, true);
+    /** 是否开机自动开启开发者选项 + ADB（永久生效）。 */
+    public static boolean isAdbAuto(Context c) {
+        return sp(c).getBoolean(K_ADB, false);
     }
 
-    public static void setFixAdb(Context c, boolean v) {
+    public static void setAdbAuto(Context c, boolean v) {
         sp(c).edit().putBoolean(K_ADB, v).apply();
     }
 

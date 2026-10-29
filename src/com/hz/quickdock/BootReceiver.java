@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 
-/** 开机自启：只负责拉起悬浮栏，不再自动改写 adb / 开发者选项开关。 */
+/** 开机自启：拉起悬浮栏；按用户设定永久开启/关闭开发者选项 + ADB。 */
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context c, Intent i) {
         if (i == null || i.getAction() == null) {
             return;
+        }
+        // 永久开关：开机时按设定写回 adb / 开发者选项状态
+        if ("android.intent.action.BOOT_COMPLETED".equals(i.getAction())) {
+            applyAdb(c, Store.isAdbAuto(c));
         }
         if (Store.isEnabled(c) && Settings.canDrawOverlays(c)) {
             try {
@@ -25,6 +29,17 @@ public class BootReceiver extends BroadcastReceiver {
                 }
             } catch (Exception ignored) {
             }
+        }
+    }
+
+    /** 写回调试开关；没有 WRITE_SECURE_SETTINGS 时静默失败。 */
+    static void applyAdb(Context c, boolean on) {
+        try {
+            Settings.Global.putInt(c.getContentResolver(),
+                    Settings.Global.ADB_ENABLED, on ? 1 : 0);
+            Settings.Global.putInt(c.getContentResolver(),
+                    Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, on ? 1 : 0);
+        } catch (Exception ignored) {
         }
     }
 }

@@ -190,28 +190,25 @@ public class MainActivity extends Activity {
                 });
         root.addView(cutout);
 
-        // ---- 立即开启开发者选项 ----
-        Button devBtn = new Button(this);
-        devBtn.setText("立即开启开发者选项 + adb（免密码）");
-        devBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                boolean ok = false;
-                try {
-                    android.provider.Settings.Global.putInt(getContentResolver(),
-                            android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 1);
-                    android.provider.Settings.Global.putInt(getContentResolver(),
-                            android.provider.Settings.Global.ADB_ENABLED, 1);
-                    ok = true;
-                } catch (Exception e) {
-                    ok = false;
-                }
-                Toast.makeText(MainActivity.this,
-                        ok ? "已开启：开发者选项 + USB 调试" : "失败：缺少 WRITE_SECURE_SETTINGS 权限",
-                        Toast.LENGTH_SHORT).show();
-                updateUi();
-            }
-        });
-        root.addView(devBtn);
+        // ---- 开发者选项 / ADB 永久开关 ----
+        CheckBox adbAuto = new CheckBox(this);
+        adbAuto.setTextColor(Color.BLACK);
+        adbAuto.setText("开机自动开启开发者选项 + ADB（取消则开机自动关闭）");
+        adbAuto.setTextSize(14);
+        adbAuto.setChecked(Store.isAdbAuto(this));
+        adbAuto.setOnCheckedChangeListener(
+                new android.widget.CompoundButton.OnCheckedChangeListener() {
+                    public void onCheckedChanged(android.widget.CompoundButton b, boolean v) {
+                        Store.setAdbAuto(MainActivity.this, v);
+                        BootReceiver.applyAdb(MainActivity.this, v);
+                        Toast.makeText(MainActivity.this,
+                                v ? "已开启：以后每次开机自动开启"
+                                  : "已关闭：以后每次开机保持关闭",
+                                Toast.LENGTH_SHORT).show();
+                        updateUi();
+                    }
+                });
+        root.addView(adbAuto);
 
         // ---- 高德开关命令（复制到电脑执行）----
         Button amapCmdBtn = new Button(this);
@@ -399,7 +396,7 @@ public class MainActivity extends Activity {
         TextView tv = new TextView(this);
         tv.setText(msg);
         tv.setTextSize(15);
-        tv.setTextColor(Color.BLACK);
+        tv.setTextColor(0xFFE8E8E8);
         tv.setTextIsSelectable(true);
         tv.setPadding(dp(20), dp(16), dp(20), dp(16));
         new AlertDialog.Builder(this)
@@ -416,7 +413,7 @@ public class MainActivity extends Activity {
 
         TextView tv = new TextView(this);
         tv.setTextSize(14);
-        tv.setTextColor(Color.BLACK);
+        tv.setTextColor(0xFFE8E8E8);
         tv.setLineSpacing(dp(4), 1f);
         tv.setText("【这是什么】\n"
                 + "一个贴在屏幕左边的悬浮快捷栏，点一下就能打开常用 App，"
@@ -448,6 +445,12 @@ public class MainActivity extends Activity {
                 + "    adb connect 车机IP:5555\n"
                 + "    adb shell pm disable com.autonavi.amapauto\n"
                 + "    adb shell pm enable com.autonavi.amapauto   （恢复）\n\n"
+                + "【关于开发者密码】\n"
+                + "· 本 App 是直接写系统设置，不需要密码\n"
+                + "· 如果自动开启失败（权限被撤销），只能手动：\n"
+                + "   车机设置 → 开发者选项 → 输密码 → 打开 USB 调试\n"
+                + "· 哪吒V 默认密码：#VA3@2021\n"
+                + "· 其它车型密码可能不同，可到车主群或论坛查\n\n"
                 + "【不想要了】\n"
                 + "关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留。");
         box.addView(tv);
@@ -464,7 +467,7 @@ public class MainActivity extends Activity {
 
         TextView cn = new TextView(this);
         cn.setTextSize(13);
-        cn.setTextColor(Color.DKGRAY);
+        cn.setTextColor(0xFFD0D0D0);
         cn.setLineSpacing(dp(4), 1f);
         cn.setPadding(0, dp(14), 0, 0);
         cn.setText("这个工具是我业余时间用 AI 帮忙做的，免费分享给大家，"
@@ -474,7 +477,7 @@ public class MainActivity extends Activity {
 
         TextView en = new TextView(this);
         en.setTextSize(11);
-        en.setTextColor(Color.GRAY);
+        en.setTextColor(0xFF9E9E9E);
         en.setLineSpacing(dp(4), 1f);
         en.setPadding(0, dp(10), 0, dp(6));
         en.setText("This tool was built in my spare time with the help of AI, "
@@ -552,7 +555,7 @@ public class MainActivity extends Activity {
 
         TextView cn = new TextView(this);
         cn.setTextSize(13);
-        cn.setTextColor(Color.DKGRAY);
+        cn.setTextColor(0xFFD0D0D0);
         cn.setLineSpacing(dp(4), 1f);
         cn.setPadding(0, dp(14), 0, 0);
         cn.setText("这个工具是我业余时间用 AI 帮忙做的，免费分享给大家，"
