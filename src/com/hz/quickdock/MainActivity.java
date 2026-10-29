@@ -92,6 +92,8 @@ public class MainActivity extends Activity {
         root.addView(listView);
 
         enableBox = new CheckBox(this);
+
+        enableBox.setTextColor(Color.BLACK);
         enableBox.setText("③ 启用悬浮栏（开机自动启动）");
         enableBox.setTextSize(16);
         enableBox.setOnCheckedChangeListener(
@@ -173,6 +175,7 @@ public class MainActivity extends Activity {
 
         // ---- 抠背景 ----
         CheckBox cutout = new CheckBox(this);
+        cutout.setTextColor(Color.BLACK);
         cutout.setText("自动去掉图标的纯色底色（只留标志）");
         cutout.setTextSize(14);
         cutout.setChecked(Store.isCutout(this));
@@ -189,6 +192,7 @@ public class MainActivity extends Activity {
 
         // ---- 小度语音按钮 ----
         CheckBox voiceBtn = new CheckBox(this);
+        voiceBtn.setTextColor(Color.BLACK);
         voiceBtn.setText("显示「小度语音」按钮（点击直达百度语音，需无障碍权限）");
         voiceBtn.setTextSize(14);
         voiceBtn.setChecked(Store.isVoiceBtn(this));
@@ -220,6 +224,7 @@ public class MainActivity extends Activity {
 
         // ---- 高德开关按钮 ----
         CheckBox amapBtn = new CheckBox(this);
+        amapBtn.setTextColor(Color.BLACK);
         amapBtn.setText("显示「高德开关」按钮（一键禁用/释放高德并释放内存）");
         amapBtn.setTextSize(14);
         amapBtn.setChecked(Store.isAmapBtn(this));
@@ -269,6 +274,7 @@ public class MainActivity extends Activity {
 
         // ---- 开机预热 ----
         CheckBox preload = new CheckBox(this);
+        preload.setTextColor(Color.BLACK);
         preload.setText("开机预热（开机后自动打开一次，提升首次加载速度）");
         preload.setTextSize(14);
         preload.setChecked(Store.isPreload(this));
@@ -296,6 +302,8 @@ public class MainActivity extends Activity {
         root.addView(pickPreload);
 
         CheckBox fixAdb = new CheckBox(this);
+
+        fixAdb.setTextColor(Color.BLACK);
         fixAdb.setText("开机时确保 adb 调试可用（需一次性授权）");
         fixAdb.setTextSize(14);
         fixAdb.setChecked(Store.isFixAdb(this));
@@ -307,65 +315,23 @@ public class MainActivity extends Activity {
                 });
         root.addView(fixAdb);
 
-        TextView tip = new TextView(this);
-        tip.setTextSize(14);
-        tip.setTextColor(Color.DKGRAY);
-        tip.setLineSpacing(dp(3), 1f);
-        tip.setPadding(0, dp(28), 0, 0);
-        tip.setText("【怎么用】\n"
-                + "1. 左侧悬浮栏贴着屏幕左边缘，按住任意图标可上下拖动整列\n"
-                + "2. 点图标 = 启动对应 App\n"
-                + "3. 长按任意图标 = 打开这个设置页\n"
-                + "4. 麦克风图标 = 一键唤起百度地图的小度语音\n\n"
-                + "【语音说明】\n"
-                + "· 点麦克风后，百度地图会自动打开并开始听\n"
-                + "· 不需要喊「你好哪吒」，也不用喊「小度小度」\n"
-                + "· 直接说指令，例如「导航到潍坊站」\n"
-                + "· 「导航回家」需要先在百度地图里设好家里的地址\n\n"
-                + "【关于高德】\n"
-                + "· 高德已禁用，不导航、不定位，只占少量内存，不影响百度导航\n"
-                + "· 需要恢复，用上面「高德禁用 / 释放 命令」，复制到电脑执行\n\n"
-                + "【不想要了】\n"
-                + "· 关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留\n");
-        root.addView(tip);
+        Button guideBtn = new Button(this);
+        guideBtn.setText("使用说明");
+        guideBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showGuide();
+            }
+        });
+        root.addView(guideBtn);
 
-        // ---- 赞赏 ----
-        TextView donateTitle = new TextView(this);
-        donateTitle.setTextSize(19);
-        donateTitle.setTextColor(Color.BLACK);
-        donateTitle.setPadding(0, dp(40), 0, dp(12));
-        donateTitle.setText("赞赏支持");
-        root.addView(donateTitle);
-
-        ImageView qr = new ImageView(this);
-        qr.setImageResource(R.drawable.donate);
-        int qw = (int) (getResources().getDisplayMetrics().widthPixels * 0.55f);
-        qr.setLayoutParams(new LinearLayout.LayoutParams(qw, qw));
-        qr.setAdjustViewBounds(true);
-        root.addView(qr);
-
-        TextView cnText = new TextView(this);
-        cnText.setTextSize(13);
-        cnText.setTextColor(Color.DKGRAY);
-        cnText.setLineSpacing(dp(3), 1f);
-        cnText.setPadding(0, dp(14), 0, 0);
-        cnText.setText("这个工具是我业余时间用 AI 帮忙做的，免费分享给大家，"
-                + "省了来回点菜单的功夫。可以给我回一回 tokens，也是有费用的；"
-                + "不方便也没关系，觉得好用，随意赞赏，谢谢车友。");
-        root.addView(cnText);
-
-        TextView enText = new TextView(this);
-        enText.setTextSize(12);
-        enText.setTextColor(Color.GRAY);
-        enText.setLineSpacing(dp(3), 1f);
-        enText.setPadding(0, dp(14), 0, dp(28));
-        enText.setText("This tool was built in my spare time with the help of AI, "
-                + "and I'm sharing it with you all for free — it saves you the "
-                + "back-and-forth of digging through the menus. If you find it useful, "
-                + "a small tip to help me cover the AI/token costs would mean a lot; "
-                + "no pressure at all if it's not convenient. Feel free to donate "
-                + "whatever feels right. Thanks, fellow Neta owners!");
-        root.addView(enText);
+        Button donateBtn = new Button(this);
+        donateBtn.setText("赞赏支持");
+        donateBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDonate();
+            }
+        });
+        root.addView(donateBtn);
 
         return sv;
     }
@@ -506,34 +472,85 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    private void showDonate() {
-        String msg = "这套东西没有广告、没有会员、不偷偷跑流量，\n"
-                + "也不会收集你的任何数据。\n\n"
-                + "从找到车机的语音入口，到让百度能听见你说话，\n"
-                + "中间试错了几十次，来回重启了不知道多少遍。\n\n"
-                + "如果你觉得它让开车方便了一点，\n"
-                + "可以扫码请我喝瓶水。\n\n"
-                + "不打赏也完全不影响使用，功能永远免费。";
+    private void showGuide() {
+        String msg = "【怎么用】\n"
+                + "1. 左侧悬浮栏贴着屏幕左边缘，按住任意图标可上下拖动整列\n"
+                + "2. 点图标 = 启动对应 App\n"
+                + "3. 长按任意图标 = 打开这个设置页\n"
+                + "4. 麦克风图标 = 一键唤起百度地图的小度语音\n\n"
+                + "【语音说明】\n"
+                + "· 点麦克风后，百度地图会自动打开并开始听\n"
+                + "· 不需要喊「你好哪吒」，也不用喊「小度小度」\n"
+                + "· 直接说指令，例如「导航到潍坊站」\n"
+                + "· 「导航回家」需要先在百度地图里设好家里的地址\n\n"
+                + "【关于高德】\n"
+                + "· 高德已禁用，不导航、不定位，只占少量内存，不影响百度导航\n"
+                + "· 需要恢复，用「高德禁用 / 释放 命令」，复制到电脑执行\n\n"
+                + "【无障碍服务】\n"
+                + "· 每次更新 App 后，系统会自动撤销无障碍授权\n"
+                + "· 打开本设置页会自动补回，若语音失效请先进来一次\n\n"
+                + "【不想要了】\n"
+                + "· 关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留";
         TextView tv = new TextView(this);
         tv.setText(msg);
         tv.setTextSize(15);
         tv.setTextColor(Color.BLACK);
         tv.setLineSpacing(dp(4), 1f);
-        tv.setPadding(dp(24), dp(16), dp(24), dp(8));
-        TextView tip = new TextView(this);
-        tip.setText("（赞赏码图片待添加）");
-        tip.setTextSize(12);
-        tip.setTextColor(Color.GRAY);
-        tip.setPadding(dp(24), 0, dp(24), dp(16));
+        tv.setPadding(dp(22), dp(16), dp(22), dp(8));
 
+        ScrollView sv = new ScrollView(this);
+        sv.addView(tv);
+
+        new AlertDialog.Builder(this)
+                .setTitle("使用说明")
+                .setView(sv)
+                .setPositiveButton("知道了", null)
+                .show();
+    }
+
+    private void showDonate() {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
-        box.addView(tv);
-        box.addView(tip);
+        box.setPadding(dp(22), dp(16), dp(22), dp(8));
+
+        ImageView qr = new ImageView(this);
+        qr.setImageResource(R.drawable.donate);
+        int qw = (int) (getResources().getDisplayMetrics().widthPixels * 0.52f);
+        LinearLayout.LayoutParams qp = new LinearLayout.LayoutParams(qw, qw);
+        qp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+        qr.setLayoutParams(qp);
+        qr.setAdjustViewBounds(true);
+        box.addView(qr);
+
+        TextView cn = new TextView(this);
+        cn.setTextSize(13);
+        cn.setTextColor(Color.DKGRAY);
+        cn.setLineSpacing(dp(4), 1f);
+        cn.setPadding(0, dp(14), 0, 0);
+        cn.setText("这个工具是我业余时间用 AI 帮忙做的，免费分享给大家，"
+                + "省了来回点菜单的功夫。可以给我回一回 tokens，也是有费用的；"
+                + "不方便也没关系，觉得好用，随意赞赏，谢谢车友。");
+        box.addView(cn);
+
+        TextView en = new TextView(this);
+        en.setTextSize(12);
+        en.setTextColor(Color.GRAY);
+        en.setLineSpacing(dp(4), 1f);
+        en.setPadding(0, dp(12), 0, 0);
+        en.setText("This tool was built in my spare time with the help of AI, "
+                + "and I'm sharing it with you all for free — it saves you the "
+                + "back-and-forth of digging through the menus. If you find it useful, "
+                + "a small tip to help me cover the AI/token costs would mean a lot; "
+                + "no pressure at all if it's not convenient. Feel free to donate "
+                + "whatever feels right. Thanks, fellow Neta owners!");
+        box.addView(en);
+
+        ScrollView sv = new ScrollView(this);
+        sv.addView(box);
 
         new AlertDialog.Builder(this)
                 .setTitle("赞赏支持")
-                .setView(box)
+                .setView(sv)
                 .setPositiveButton("关闭", null)
                 .show();
     }
@@ -601,6 +618,27 @@ public class MainActivity extends Activity {
         super.onResume();
         updateUi();
         setDockVisible(false);
+        ensureAccessibility();
+    }
+
+    /** 每次覆盖安装后系统会撤销无障碍授权，打开本页即自动补回。 */
+    private void ensureAccessibility() {
+        try {
+            String mine = getPackageName() + "/" + VoiceClickService.class.getName();
+            String cur = android.provider.Settings.Secure.getString(getContentResolver(),
+                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (cur == null) {
+                cur = "";
+            }
+            if (!cur.contains(mine)) {
+                String nv = cur.isEmpty() ? mine : cur + ":" + mine;
+                android.provider.Settings.Secure.putString(getContentResolver(),
+                        android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, nv);
+            }
+            android.provider.Settings.Secure.putInt(getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
