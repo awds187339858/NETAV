@@ -190,38 +190,6 @@ public class MainActivity extends Activity {
                 });
         root.addView(cutout);
 
-        // ---- 小度语音按钮 ----
-        CheckBox voiceBtn = new CheckBox(this);
-        voiceBtn.setTextColor(Color.BLACK);
-        voiceBtn.setText("显示「小度语音」按钮（点击直达百度语音，需无障碍权限）");
-        voiceBtn.setTextSize(14);
-        voiceBtn.setChecked(Store.isVoiceBtn(this));
-        voiceBtn.setOnCheckedChangeListener(
-                new android.widget.CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(android.widget.CompoundButton b, boolean v) {
-                        Store.setVoiceBtn(MainActivity.this, v);
-                        if (Store.isEnabled(MainActivity.this)) {
-                            DockService.refresh(MainActivity.this);
-                        }
-                    }
-                });
-        root.addView(voiceBtn);
-
-        Button accBtn = new Button(this);
-        accBtn.setText("打开无障碍设置（授权语音助手）");
-        accBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try {
-                    startActivity(new Intent(
-                            android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS));
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "打不开无障碍设置：" + e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        root.addView(accBtn);
-
         // ---- 立即开启开发者选项 ----
         Button devBtn = new Button(this);
         devBtn.setText("立即开启开发者选项 + adb（免密码）");
@@ -458,20 +426,11 @@ public class MainActivity extends Activity {
     private void showGuide() {
         String msg = "【怎么用】\n"
                 + "1. 左侧悬浮栏贴着屏幕左边缘，按住任意图标可上下拖动整列\n"
-                + "2. 点图标 = 启动对应 App\n"
-                + "3. 长按任意图标 = 打开这个设置页\n"
-                + "4. 麦克风图标 = 一键唤起百度地图的小度语音\n\n"
-                + "【语音说明】\n"
-                + "· 点麦克风后，百度地图会自动打开并开始听\n"
-                + "· 不需要喊「你好哪吒」，也不用喊「小度小度」\n"
-                + "· 直接说指令，例如「导航到潍坊站」\n"
-                + "· 「导航回家」需要先在百度地图里设好家里的地址\n\n"
+                + "2. 点图标 = 启动对应 App（带车机原声点击音效）\n"
+                + "3. 长按任意图标 = 打开这个设置页\n\n"
                 + "【关于高德】\n"
                 + "· 高德已禁用，不导航、不定位，只占少量内存，不影响百度导航\n"
                 + "· 需要恢复，用「高德禁用 / 释放 命令」，复制到电脑执行\n\n"
-                + "【无障碍服务】\n"
-                + "· 每次更新 App 后，系统会自动撤销无障碍授权\n"
-                + "· 打开本设置页会自动补回，若语音失效请先进来一次\n\n"
                 + "【不想要了】\n"
                 + "· 关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留";
         TextView tv = new TextView(this);
@@ -601,27 +560,6 @@ public class MainActivity extends Activity {
         super.onResume();
         updateUi();
         setDockVisible(false);
-        ensureAccessibility();
-    }
-
-    /** 每次覆盖安装后系统会撤销无障碍授权，打开本页即自动补回。 */
-    private void ensureAccessibility() {
-        try {
-            String mine = getPackageName() + "/" + VoiceClickService.class.getName();
-            String cur = android.provider.Settings.Secure.getString(getContentResolver(),
-                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            if (cur == null) {
-                cur = "";
-            }
-            if (!cur.contains(mine)) {
-                String nv = cur.isEmpty() ? mine : cur + ":" + mine;
-                android.provider.Settings.Secure.putString(getContentResolver(),
-                        android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, nv);
-            }
-            android.provider.Settings.Secure.putInt(getContentResolver(),
-                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED, 1);
-        } catch (Exception ignored) {
-        }
     }
 
     @Override

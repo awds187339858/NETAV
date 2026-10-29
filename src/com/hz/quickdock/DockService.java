@@ -13,6 +13,8 @@ import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,11 +40,35 @@ public class DockService extends Service {
     private View dock;
     private WindowManager.LayoutParams lp;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private SoundPool soundPool;
+    private int clickId = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        initSound();
+    }
+
+    /** 加载车机自带的点击音效，与系统 UI 点击声一致。 */
+    private void initSound() {
+        try {
+            soundPool = new SoundPool(2, AudioManager.STREAM_SYSTEM, 0);
+            clickId = soundPool.load("/product/media/audio/ui/Effect_Tick.ogg", 1);
+        } catch (Exception ignored) {
+            soundPool = null;
+        }
+    }
+
+    private void playClick(View v) {
+        try {
+            if (soundPool != null && clickId > 0) {
+                soundPool.play(clickId, 0.8f, 0.8f, 1, 0, 1.0f);
+            } else if (v != null) {
+                v.playSoundEffect(android.view.SoundEffectConstants.CLICK);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -65,45 +91,9 @@ public class DockService extends Service {
         }
         buildDock();
         if (intent != null && intent.getBooleanExtra("boot", false)) {
-            // 开机后分多个时间点补回无障碍服务，越早越好，避免用户开机就用时还没恢复
-            final Runnable fixAcc = new Runnable() {
-                @Override
-                public void run() {
-                    ensureAccessibility();
-                }
-            };
-            handler.postDelayed(fixAcc, 4000L);
-            handler.postDelayed(fixAcc, 12000L);
-            handler.postDelayed(fixAcc, 30000L);
             schedulePreload();
         }
         return START_STICKY;
-    }
-
-    /**
-     * 车机重启会把 enabled_accessibility_services 里的第三方服务摘掉，
-     * 这里在开机后补回去（保留思必驰那条，只做追加）。
-     */
-    private void ensureAccessibility() {
-        try {
-            String mine = getPackageName() + "/" + VoiceClickService.class.getName();
-            String cur = Settings.Secure.getString(getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            if (cur == null) {
-                cur = "";
-            }
-            if (!cur.contains(mine)) {
-                String nv = cur.isEmpty() ? mine : cur + ":" + mine;
-                Settings.Secure.putString(getContentResolver(),
-                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, nv);
-                Settings.Secure.putInt(getContentResolver(),
-                        Settings.Secure.ACCESSIBILITY_ENABLED, 1);
-            } else {
-                Settings.Secure.putInt(getContentResolver(),
-                        Settings.Secure.ACCESSIBILITY_ENABLED, 1);
-            }
-        } catch (Exception ignored) {
-        }
     }
 
     /** 开机后延迟预热：拉起目标 App 让界面缓存建好，几秒后自动回桌面。 */
@@ -226,31 +216,6 @@ public class DockService extends Service {
                 }
             });
             root.addView(iv);
-            count++;
-        }
-
-        if (Store.isVoiceBtn(this)) {
-            ImageView vb = new ImageView(this);
-            vb.setImageResource(android.R.drawable.ic_btn_speak_now);
-            vb.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            LinearLayout.LayoutParams vp = new LinearLayout.LayoutParams(size, size);
-            vp.topMargin = margin;
-            vb.setLayoutParams(vp);
-            vb.setOnTouchListener(makeTouch(new Runnable() {
-                public void run() {
-                    voiceLaunch();
-                }
-            }));
-            vb.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Intent i = new Intent(DockService.this, MainActivity.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
-                    return true;
-                }
-            });
-            root.addView(vb);
             count++;
         }
 
@@ -438,6 +403,7 @@ public class DockService extends Service {
                         if (moved && lp != null) {
                             Store.setY(DockService.this, lp.y);
                         } else {
+                            playClick(v);
                             onTap.run();
                         }
                         return true;
@@ -448,25 +414,6 @@ public class DockService extends Service {
                 }
             }
         };
-    }
-
-    /** 唤起百度地图并让小度语音自动就绪。 */
-    private void voiceLaunch() {
-        try {
-            Intent i = getPackageManager().getLaunchIntentForPackage("com.baidu.naviauto");
-            if (i != null) {
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                startActivity(i);
-            }
-        } catch (Exception ignored) {
-        }
-        VoiceClickService.arm();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                VoiceClickService.arm();
-            }
-        }, 3000L);
     }
 
     private void launch(String pkg) {
