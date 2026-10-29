@@ -50,11 +50,11 @@ public class DockService extends Service {
         initSound();
     }
 
-    /** 加载车机自带的点击音效，与系统 UI 点击声一致。 */
+    /** 加载车机自带的点击音效。 */
     private void initSound() {
         try {
             soundPool = new SoundPool(2, AudioManager.STREAM_SYSTEM, 0);
-            clickId = soundPool.load("/product/media/audio/ui/Effect_Tick.ogg", 1);
+            clickId = soundPool.load("/product/media/audio/ui/KeypressStandard.ogg", 1);
         } catch (Exception ignored) {
             soundPool = null;
         }
@@ -63,7 +63,7 @@ public class DockService extends Service {
     private void playClick(View v) {
         try {
             if (soundPool != null && clickId > 0) {
-                soundPool.play(clickId, 0.8f, 0.8f, 1, 0, 1.0f);
+                soundPool.play(clickId, 1.0f, 1.0f, 1, 0, 1.0f);
             } else if (v != null) {
                 v.playSoundEffect(android.view.SoundEffectConstants.CLICK);
             }

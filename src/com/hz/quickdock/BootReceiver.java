@@ -6,16 +6,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 
-/** 开机自启：拉起悬浮栏；顺带确保 adb 开关为 1。 */
+/** 开机自启：只负责拉起悬浮栏，不再自动改写 adb / 开发者选项开关。 */
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context c, Intent i) {
         if (i == null || i.getAction() == null) {
             return;
-        }
-        if (Store.isFixAdb(c)) {
-            ensureAdb(c);
         }
         if (Store.isEnabled(c) && Settings.canDrawOverlays(c)) {
             try {
@@ -28,20 +25,6 @@ public class BootReceiver extends BroadcastReceiver {
                 }
             } catch (Exception ignored) {
             }
-        }
-    }
-
-    /** 写 Global 设置需要 WRITE_SECURE_SETTINGS（一次性 adb grant 授予后永久有效）。 */
-    private void ensureAdb(Context c) {
-        try {
-            Settings.Global.putInt(c.getContentResolver(),
-                    Settings.Global.ADB_ENABLED, 1);
-        } catch (Exception ignored) {
-        }
-        try {
-            Settings.Global.putInt(c.getContentResolver(),
-                    Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 1);
-        } catch (Exception ignored) {
         }
     }
 }

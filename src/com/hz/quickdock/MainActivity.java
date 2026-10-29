@@ -252,37 +252,23 @@ public class MainActivity extends Activity {
         });
         root.addView(pickPreload);
 
-        CheckBox fixAdb = new CheckBox(this);
-
-        fixAdb.setTextColor(Color.BLACK);
-        fixAdb.setText("开机时确保 adb 调试可用（需一次性授权）");
-        fixAdb.setTextSize(14);
-        fixAdb.setChecked(Store.isFixAdb(this));
-        fixAdb.setOnCheckedChangeListener(
-                new android.widget.CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(android.widget.CompoundButton b, boolean v) {
-                        Store.setFixAdb(MainActivity.this, v);
-                    }
-                });
-        root.addView(fixAdb);
+        Button orderBtn = new Button(this);
+        orderBtn.setText("调整图标顺序");
+        orderBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showOrderDialog();
+            }
+        });
+        root.addView(orderBtn);
 
         Button guideBtn = new Button(this);
-        guideBtn.setText("使用说明");
+        guideBtn.setText("使用说明 / 关于");
         guideBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showGuide();
             }
         });
         root.addView(guideBtn);
-
-        Button donateBtn = new Button(this);
-        donateBtn.setText("赞赏支持");
-        donateBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDonate();
-            }
-        });
-        root.addView(donateBtn);
 
         return sv;
     }
@@ -424,29 +410,129 @@ public class MainActivity extends Activity {
     }
 
     private void showGuide() {
-        String msg = "【怎么用】\n"
-                + "1. 左侧悬浮栏贴着屏幕左边缘，按住任意图标可上下拖动整列\n"
-                + "2. 点图标 = 启动对应 App（带车机原声点击音效）\n"
-                + "3. 长按任意图标 = 打开这个设置页\n\n"
-                + "【关于高德】\n"
-                + "· 高德已禁用，不导航、不定位，只占少量内存，不影响百度导航\n"
-                + "· 需要恢复，用「高德禁用 / 释放 命令」，复制到电脑执行\n\n"
-                + "【不想要了】\n"
-                + "· 关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留";
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(22), dp(16), dp(22), dp(8));
+
         TextView tv = new TextView(this);
-        tv.setText(msg);
-        tv.setTextSize(15);
+        tv.setTextSize(14);
         tv.setTextColor(Color.BLACK);
         tv.setLineSpacing(dp(4), 1f);
-        tv.setPadding(dp(22), dp(16), dp(22), dp(8));
+        tv.setText("【这是什么】\n"
+                + "一个贴在屏幕左边的悬浮快捷栏，点一下就能打开常用 App，"
+                + "不用再一层层点菜单。不 root、不改系统、卸载即净。\n\n"
+                + "【怎么用】\n"
+                + "1. 按住任意图标可上下拖动整列\n"
+                + "2. 点图标 = 启动对应 App（带点击音效）\n"
+                + "3. 长按任意图标 = 打开本设置页\n"
+                + "4. 「选择要显示的 APP」可勾选任意已安装应用\n"
+                + "5. 「调整图标顺序」里点某一项，就让它上移一位\n\n"
+                + "【设置项说明】\n"
+                + "· 图标大小 / 不透明度：拖滑杆实时生效\n"
+                + "· 自动去掉纯色底色：把图标的白底/红底抠透明，只留标志\n"
+                + "· 开机预热：开机后自动打开一次指定 App，首次点开更快\n"
+                + "· 立即开启开发者选项 + ADB：一键写回调试开关（免密码）\n\n"
+                + "【怎么禁用高德（省内存）】\n"
+                + "高德被系统三个组件（carautomapmanager / 思必驰 / 智能提醒）绑定，"
+                + "App 自己杀不掉，必须从外部发命令。\n\n"
+                + "方法一：手机 + 甲壳虫 ADB（推荐，不用电脑）\n"
+                + "1. 车机开热点，或手机与车机连同一个 WiFi\n"
+                + "2. 手机装「甲壳虫 ADB 助手」\n"
+                + "3. 先在车机上点本页「立即开启开发者选项 + ADB」\n"
+                + "4. 甲壳虫里填「车机IP:5555」连接\n"
+                + "5. 进「命令行」输入：\n"
+                + "    pm disable com.autonavi.amapauto\n"
+                + "6. 想恢复就输入：\n"
+                + "    pm enable com.autonavi.amapauto\n\n"
+                + "方法二：电脑 ADB\n"
+                + "    adb connect 车机IP:5555\n"
+                + "    adb shell pm disable com.autonavi.amapauto\n"
+                + "    adb shell pm enable com.autonavi.amapauto   （恢复）\n\n"
+                + "【不想要了】\n"
+                + "关掉「启用悬浮栏」即隐藏；卸载本程序不留任何残留。");
+        box.addView(tv);
+
+        ImageView qr = new ImageView(this);
+        qr.setImageResource(R.drawable.donate);
+        int qw = (int) (getResources().getDisplayMetrics().widthPixels * 0.5f);
+        LinearLayout.LayoutParams qp = new LinearLayout.LayoutParams(qw, qw);
+        qp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+        qp.topMargin = dp(22);
+        qr.setLayoutParams(qp);
+        qr.setAdjustViewBounds(true);
+        box.addView(qr);
+
+        TextView cn = new TextView(this);
+        cn.setTextSize(13);
+        cn.setTextColor(Color.DKGRAY);
+        cn.setLineSpacing(dp(4), 1f);
+        cn.setPadding(0, dp(14), 0, 0);
+        cn.setText("这个工具是我业余时间用 AI 帮忙做的，免费分享给大家，"
+                + "省了来回点菜单的功夫。可以给我回一回 tokens，也是有费用的；"
+                + "不方便也没关系，觉得好用，随意赞赏，谢谢车友。");
+        box.addView(cn);
+
+        TextView en = new TextView(this);
+        en.setTextSize(11);
+        en.setTextColor(Color.GRAY);
+        en.setLineSpacing(dp(4), 1f);
+        en.setPadding(0, dp(10), 0, dp(6));
+        en.setText("This tool was built in my spare time with the help of AI, "
+                + "and I'm sharing it with you all for free — it saves you the "
+                + "back-and-forth of digging through the menus. If you find it useful, "
+                + "a small tip to help me cover the AI/token costs would mean a lot; "
+                + "no pressure at all if it's not convenient. Feel free to donate "
+                + "whatever feels right. Thanks, fellow Neta owners!");
+        box.addView(en);
 
         ScrollView sv = new ScrollView(this);
-        sv.addView(tv);
+        sv.addView(box);
 
         new AlertDialog.Builder(this)
-                .setTitle("使用说明")
+                .setTitle("使用说明 / 关于")
                 .setView(sv)
                 .setPositiveButton("知道了", null)
+                .show();
+    }
+
+    /** 调整图标顺序：点某一项就让它上移一位。 */
+    private void showOrderDialog() {
+        final List<String> pkgs = new ArrayList<String>(Store.getPkgs(this));
+        if (pkgs.size() < 2) {
+            Toast.makeText(this, "至少选 2 个 App 才能调整顺序", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        PackageManager pm = getPackageManager();
+        final String[] names = new String[pkgs.size()];
+        for (int i = 0; i < pkgs.size(); i++) {
+            String label;
+            try {
+                label = pm.getApplicationLabel(pm.getApplicationInfo(pkgs.get(i), 0)).toString();
+            } catch (Exception e) {
+                label = pkgs.get(i);
+            }
+            names[i] = (i + 1) + ". " + label;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("调整顺序（点某一项 = 上移一位）")
+                .setItems(names, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int which) {
+                        if (which == 0) {
+                            Toast.makeText(MainActivity.this, "已经在最上面了",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        String tmp = pkgs.get(which - 1);
+                        pkgs.set(which - 1, pkgs.get(which));
+                        pkgs.set(which, tmp);
+                        Store.setPkgs(MainActivity.this, pkgs);
+                        if (Store.isEnabled(MainActivity.this)) {
+                            DockService.refresh(MainActivity.this);
+                        }
+                        showOrderDialog();
+                    }
+                })
+                .setNegativeButton("完成", null)
                 .show();
     }
 
