@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">快捷侧栏</string>
+    <string name="svc_desc">用于在点按侧栏语音按钮后，自动点击百度地图的「小度」语音入口。平时不监听任何界面。</string>
+</resources>

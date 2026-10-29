@@ -1,0 +1,16 @@
+# 构建产物
+build/
+*.apk
+
+# 签名密钥（绝对不要提交）
+*.keystore
+*.jks
+
+# IDE / 系统
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.log
