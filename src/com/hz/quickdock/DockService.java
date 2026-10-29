@@ -61,11 +61,18 @@ public class DockService extends Service {
     }
 
     private void playClick(View v) {
+        // 优先走系统音效通道：音量、音色与车机自带点击完全一致
+        try {
+            if (v != null && v.isSoundEffectsEnabled()) {
+                v.playSoundEffect(android.view.SoundEffectConstants.CLICK);
+                return;
+            }
+        } catch (Exception ignored) {
+        }
+        // 兜底：系统 FX 不可用时用 SoundPool 播
         try {
             if (soundPool != null && clickId > 0) {
                 soundPool.play(clickId, 1.0f, 1.0f, 1, 0, 1.0f);
-            } else if (v != null) {
-                v.playSoundEffect(android.view.SoundEffectConstants.CLICK);
             }
         } catch (Exception ignored) {
         }
