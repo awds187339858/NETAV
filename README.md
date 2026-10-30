@@ -1,8 +1,8 @@
-# 快捷侧栏 · QuickDock
+﻿# 风火轮 · Firewheel
 
-给**哪吒 V（2021 款 400L，Android 10）**车机做的侧边悬浮快捷栏。
+哪吒 V 车机的侧边悬浮快捷栏。
 
-不用改系统、不用 root，装个普通 App 就能在屏幕左边缘得到一排能点的图标——点开百度地图、网易云，或者一键唤起百度地图的「小度」语音，不用再一层层点菜单。
+不用改系统、不用 root，装个普通 App 就能在屏幕左边缘得到一排能点的图标——点开百度地图、网易云，不用再一层层点菜单。
 
 > 个人业余作品，非官方工具。改车机有风险，请自行判断，出问题自负。
 
@@ -142,3 +142,5 @@ This tool was built in my spare time with the help of AI, and I'm sharing it wit
 ## License
 
 MIT
+
+
