@@ -26,34 +26,50 @@
 
 ## 安装
 
-### 方式一：adb（推荐）
+### 方式一：adb
 
 ```bash
-adb install -r QuickDock.apk
-```
-
-装完先授权一次：
-
-```bash
-# 悬浮窗
-adb shell appops set com.hz.quickdock SYSTEM_ALERT_WINDOW allow
-
-# 开机确保 adb 可用（可选）
-adb shell pm grant com.hz.quickdock android.permission.WRITE_SECURE_SETTINGS
+adb install -r Firewheel-v1.0.apk
 ```
 
 ### 方式二：U 盘
 
-把 APK 拷到 U 盘，插车机安装。装完**仍需**用 adb 执行上面两条授权，否则悬浮窗不会显示。
+把 APK 拷到 U 盘，插车机安装（需在设置里允许「安装未知来源应用」）。
+
+**两种方式装完效果完全一样，都【不需要】额外授权。**
 
 ---
 
-## 首次使用
+## 首次使用（全程不需要 adb）
 
-1. 打开「快捷侧栏」
-2. 点 **① 授予悬浮窗权限** → 打开开关
+1. 打开 **Firewheel**
+2. 点 **① 授予悬浮窗权限** → 系统会跳到「显示在其他应用上层 / 悬浮窗」页面 → 打开开关 → 返回 App
 3. 点 **② 选择要显示的 APP** → 勾选想要的 App → 保存
 4. 勾选 **③ 启用悬浮栏** → 左侧图标列出现
+
+> 悬浮窗走的是 Android 标准「特殊应用权限」，**在 App 里点一下、系统设置里开一下就行，全程不需要 adb、不需要 root**。
+
+### 可选：想让「开机自动开启开发者选项 + ADB」也能用
+
+只有这一项需要 adb（一次性，之后永久有效）：
+
+```bash
+adb shell pm grant com.hz.quickdock android.permission.WRITE_SECURE_SETTINGS
+```
+
+不执行也能正常用悬浮栏，只是那个开关勾选时会弹提示「无法自动开启」，并引导你跳到设置页手动开 USB 调试。
+
+### 备用：车机设置里找不到「悬浮窗」开关怎么办
+
+极少数车机把这项藏起来了。**这时才需要**用命令兜底：
+
+```bash
+adb shell appops set com.hz.quickdock SYSTEM_ALERT_WINDOW allow
+```
+
+也可以用手机装「甲壳虫 ADB 助手」连车机执行（App 里的「ADB 授权命令」按钮有完整步骤）。
+
+---
 
 ### 想用「一键小度语音」
 
