@@ -1,4 +1,4 @@
-﻿# 风火轮 · Firewheel
+# 风火轮 · Firewheel
 
 哪吒 V 车机的侧边悬浮快捷栏。
 
@@ -58,6 +58,8 @@ adb shell pm grant com.hz.quickdock android.permission.WRITE_SECURE_SETTINGS
 ### 想用「一键小度语音」
 
 > ⚠️ **v1.0 已移除该功能**。实测在 哪吒V（Android 10 / 百度地图汽车版 21.5.3）上，点开语音条后百度**从不建立录音流**（`dumpsys media.audio_flinger` 始终只有思必驰的 echo reference 一条），已排除权限、麦克风抢占、点击方式等因素，属百度侧限制。相关代码已删除，详见下方「已知限制」。
+>
+> **建议：语音控制导航直接用手机自带的 AI 助手**（小爱同学、小度、Siri 都行），让手机发导航指令，比在车机上折腾省心得多。
 
 ---
 
