@@ -1,6 +1,6 @@
-# 风火轮 · Firewheel
+﻿# NETAV
 
-哪吒 V 车机的侧边悬浮快捷栏。
+哪吒 V 车机的侧边快捷导航栏。
 
 不用改系统、不用 root，装个普通 App 就能在屏幕左边缘得到一排能点的图标——点开百度地图、网易云，不用再一层层点菜单。
 
@@ -160,5 +160,6 @@ This tool was built in my spare time with the help of AI, and I'm sharing it wit
 ## License
 
 MIT
+
 
 
