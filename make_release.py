@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import json
 import os
 import subprocess
 import urllib.request
 
-REPO = "awds187339858/Firewheel"
+REPO = "awds187339858/NETAV"
 TAG = "v1.0"
 NAME = "NETAV快捷侧栏"
 APK = os.path.join("release", "NETAV-v1.0.apk")
@@ -119,3 +119,4 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
